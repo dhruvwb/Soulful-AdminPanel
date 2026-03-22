@@ -148,21 +148,31 @@ const DataProvider = ({ children }) => {
   };
 
   const addDomesticPackage = async data => {
-    const formData = buildPackageFormData(data);
-    const response = await api.post('/admin/domestic', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    });
-    setPackagesDomestic(prev => [response.data, ...prev]);
-    refreshActivity();
+    try {
+      const formData = buildPackageFormData(data);
+      const response = await api.post('/admin/domestic', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setPackagesDomestic(prev => [response.data, ...prev]);
+      refreshActivity();
+    } catch (error) {
+      console.error('❌ Error adding package:', error.response?.data || error.message);
+      throw error;
+    }
   };
 
   const updateDomesticPackage = async data => {
-    const formData = buildPackageFormData(data);
-    const response = await api.put(`/admin/domestic/${data.id}`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    });
-    setPackagesDomestic(prev => prev.map(item => (item._id === data.id ? response.data : item)));
-    refreshActivity();
+    try {
+      const formData = buildPackageFormData(data);
+      const response = await api.put(`/admin/domestic/${data.id}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setPackagesDomestic(prev => prev.map(item => (item._id === data.id ? response.data : item)));
+      refreshActivity();
+    } catch (error) {
+      console.error('❌ Error updating package:', error.response?.data || error.message);
+      throw error;
+    }
   };
 
   const deleteDomesticPackage = async id => {
@@ -529,6 +539,7 @@ const DataProvider = ({ children }) => {
 
   const unreadEnquiriesCount = enquiries.filter(item => !item.isRead).length;
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const value = useMemo(
     () => ({
       packagesDomestic,
@@ -586,6 +597,7 @@ const DataProvider = ({ children }) => {
       deleteEnquiry,
       saveCms
     }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       packagesDomestic,
       blogs,
@@ -600,7 +612,47 @@ const DataProvider = ({ children }) => {
       cms,
       activity,
       stats,
-      unreadEnquiriesCount
+      unreadEnquiriesCount,
+      addBlog,
+      addCustomPackage,
+      addDestination,
+      addDomesticPackage,
+      addGalleryItem,
+      addNews,
+      addPackageCategory,
+      addPopularPackage,
+      addReview,
+      deleteBlog,
+      deleteCustomPackage,
+      deleteDestination,
+      deleteDomesticPackage,
+      deleteGalleryItem,
+      deleteNews,
+      deletePackageCategory,
+      deletePopularPackage,
+      deleteReview,
+      loading,
+      saveCms,
+      updateBlog,
+      updateCustomPackage,
+      updateDestination,
+      updateDomesticPackage,
+      updateGalleryItem,
+      updateNews,
+      updatePackageCategory,
+      updatePopularPackage,
+      updateReview,
+      toggleBlog,
+      toggleCustomPackage,
+      toggleDomesticPackage,
+      toggleDestination,
+      toggleGalleryItem,
+      toggleNews,
+      togglePackageCategory,
+      togglePopularPackage,
+      toggleReview,
+      markEnquiryRead,
+      deleteEnquiry
     ]
   );
 

@@ -4,7 +4,6 @@ import {
   Button,
   Paper,
   Stack,
-  TextField,
   Typography
 } from '@mui/material';
 import { getAssetUrl } from '../services/api';
@@ -36,11 +35,6 @@ export default function AboutUs() {
       });
     }
   }, [cms]);
-
-  const handleChange = event => {
-    const { name, value } = event.target;
-    setForm(prev => ({ ...prev, [name]: value }));
-  };
 
   const handleBannerImage = event => {
     const files = Array.from(event.target.files || []);
