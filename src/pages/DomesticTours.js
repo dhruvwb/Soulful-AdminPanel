@@ -57,6 +57,8 @@ export default function DomesticTours() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(emptyPackage);
+  const [curlData, setCurlData] = useState('');
+  const [showCurlInput, setShowCurlInput] = useState(false);
 
   const handleOpen = pkg => {
     if (pkg) {
@@ -121,16 +123,60 @@ export default function DomesticTours() {
     }));
   };
 
-  const handleSave = () => {
+  const parseCurlData = () => {
+    try {
+      // Try to parse as JSON first
+      let data = JSON.parse(curlData);
+      setForm(prev => ({
+        ...prev,
+        ...data,
+        newImages: prev.newImages,
+        existingImages: prev.existingImages
+      }));
+      setCurlData('');
+      alert('✅ Data parsed and form updated!');
+    } catch (e) {
+      alert('❌ Invalid JSON format. Please paste valid JSON data.');
+    }
+  };
+
+  const generateCurlExample = () => {
+    const exampleData = {
+      title: 'Golden Triangle Tour',
+      duration: '5 Nights / 6 Days',
+      price: '45000',
+      location: 'Delhi - Agra - Jaipur',
+      shortDescription: 'Explore the iconic golden triangle spanning Delhi, Agra, and Jaipur',
+      description: 'Experience the best of North India with our comprehensive Golden Triangle Tour',
+      itinerary: 'Day 1: Delhi arrival...',
+      highlights: 'Taj Mahal, Red Fort, Hawa Mahal',
+      inclusions: 'Accommodation, Meals, Guide, Transport',
+      exclusions: 'Flights, Personal expenses',
+      metaTitle: 'Best Golden Triangle Tour in India',
+      metaDescription: 'Discover the iconic Golden Triangle with our luxury tour package'
+    };
+    setCurlData(JSON.stringify(exampleData, null, 2));
+  };
+
+  const handleSave = async () => {
     if (!form.title.trim()) {
+      alert('❌ Package title is required');
       return;
     }
-    if (editing) {
-      updateDomesticPackage(form);
-    } else {
-      addDomesticPackage(form);
+    try {
+      if (editing) {
+        await updateDomesticPackage(form);
+        alert('✅ Package updated successfully!');
+      } else {
+        await addDomesticPackage(form);
+        alert('✅ Package added successfully!');
+      }
+      setOpen(false);
+    } catch (error) {
+      console.error('Error saving package:', error);
+      const errorMsg = error.response?.data?.message || error.message || 'Failed to save package';
+      alert(`❌ Error: ${errorMsg}`);
     }
-    setOpen(false);
   };
 
   const rows = useMemo(() => packagesDomestic, [packagesDomestic]);
@@ -203,6 +249,42 @@ export default function DomesticTours() {
         <DialogTitle>{editing ? 'Edit Package' : 'Add Package'}</DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'grid', gap: 2, marginTop: 1 }}>
+            {/* Curl/JSON Data Input Section */}
+            <Box sx={{ padding: 2, backgroundColor: '#f5f5f5', borderRadius: 1, border: '1px solid #ddd' }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 600, marginBottom: 1 }}>
+                📋 Quick Import (Optional)
+              </Typography>
+              {!showCurlInput ? (
+                <Button variant="outlined" size="small" onClick={() => setShowCurlInput(true)}>
+                  Show JSON Import
+                </Button>
+              ) : (
+                <Box sx={{ display: 'grid', gap: 1 }}>
+                  <TextField
+                    label="Paste JSON Data"
+                    value={curlData}
+                    onChange={e => setCurlData(e.target.value)}
+                    fullWidth
+                    multiline
+                    minRows={4}
+                    placeholder='{"title": "Package Name", "price": "50000", ...}'
+                  />
+                  <Stack direction="row" spacing={1}>
+                    <Button variant="contained" size="small" onClick={parseCurlData}>
+                      Parse & Fill Form
+                    </Button>
+                    <Button variant="outlined" size="small" onClick={generateCurlExample}>
+                      Load Example
+                    </Button>
+                    <Button variant="text" size="small" onClick={() => setShowCurlInput(false)}>
+                      Hide
+                    </Button>
+                  </Stack>
+                </Box>
+              )}
+            </Box>
+
+            {/* Regular Form Fields */}
             <TextField
               label="Package Title"
               name="title"
