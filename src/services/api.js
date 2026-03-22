@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE = 'https://soul-full-backend.onrender.com/api';
+const API_BASE = process.env.REACT_APP_API_BASE || 'https://soul-full-backend.onrender.com/api';
 
 const getStoredToken = () => {
   const raw = localStorage.getItem('sit_admin_token');
